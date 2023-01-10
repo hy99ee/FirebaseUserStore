@@ -7,6 +7,9 @@ let feedDispatcher: DispatcherType<FeedAction, FeedMutation, FeedPackages> = { a
     case .updateFeed:
         return mutationFetchItems(packages: packages)
 
+    case let .click(item):
+        return Just(FeedMutation.detail(item: item)).eraseToAnyPublisher()
+
     case .addItem:
         return mutationAddItem(packages: packages).withStatus(start: FeedMutation.progressButtonStatus(status: .start), finish: FeedMutation.progressButtonStatus(status: .stop))
 

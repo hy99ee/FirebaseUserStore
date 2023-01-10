@@ -42,3 +42,11 @@ struct ButtonView: View {
         )
     }
 }
+
+extension View {
+    func visibleDisabled(_ disabled: Bool) -> some View {
+        self.overlay {
+            Rectangle().background(.gray).opacity(disabled ? 0.15 : 0).mask(self)
+        }
+    }
+}

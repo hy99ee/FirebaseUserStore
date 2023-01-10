@@ -1,10 +1,3 @@
-//
-//  ImageView.swift
-//  FirebaseUserStore
-//
-//  Created by hy99ee on 08.12.2022.
-//
-
 import SwiftUI
 
 struct ImageView: View {

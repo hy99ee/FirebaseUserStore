@@ -1,17 +1,16 @@
 import Combine
 import Foundation
 
-let loginReducer: ReducerType<LoginState, LoginMutation> = { _state, mutation in
+let loginReducer: ReducerType<LoginState, LoginMutation, LoginLink> = { _state, mutation in
     var state = _state
+    var link: LoginLink?
+
     switch mutation {
     case let .showRegister(store):
-        state.registerSheet.initialize(with: store)
+        return Just(.coordinate(destination: .register(store: store))).eraseToAnyPublisher()
 
-    case let .showForgot(store):
-        state.forgotSheet.initialize(with: store)
-
-    case .closeForgot:
-        state.forgotSheet.deinitialize()
+    case .showForgot:
+        return Just(.coordinate(destination: .forgot)).eraseToAnyPublisher()
 
     case .login:
         break
@@ -24,20 +23,14 @@ let loginReducer: ReducerType<LoginState, LoginMutation> = { _state, mutation in
 
     case let .progressRegisterStatus(status):
         state.registerProgress.progressStatus = status
-
-    case let .progressForgotStatus(status):
-        state.forgotProgress.progressStatus = status
         
     case let .errorAlert(error):
         state.alert.error = error
 
     case .errorWithRegister:
         break
-
-    case .errorWithForgot:
-        state.forgotSheet.isValidEmailField = false
     }
 
-    return Just(state).eraseToAnyPublisher()
+    return Just(.state(state)).eraseToAnyPublisher()
 }
 

@@ -64,13 +64,9 @@ struct AboutView: View {
                         }
                     }
                 }
-                
                 .scrollDisabled(true)
             }
-            
-            
         }
-    
     }
 }
 

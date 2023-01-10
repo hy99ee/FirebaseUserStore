@@ -1,10 +1,3 @@
-//
-//  SearchBar.swift
-//  FirebaseUserStore
-//
-//  Created by hy99ee on 20.12.2022.
-//
-
 import SwiftUI
 
 struct SearchBar: View {
@@ -18,6 +11,16 @@ struct SearchBar: View {
                 Image(systemName: "magnifyingglass")
                 TextField("Search...", text: $searchQuery)
                     .foregroundColor(.secondary)
+                
+                if !searchQuery.isEmpty {
+                    Button {
+                        searchQuery = ""
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundColor(.gray)
+                    }
+                    .padding(.trailing, 5)
+                }
             }
             .foregroundColor(.gray)
             .padding(.leading, 13)

@@ -17,8 +17,7 @@ struct FeedView: View {
 
         searchQueryBublisher
             .removeDuplicates()
-            .debounce(for: .seconds(1), scheduler: DispatchQueue.global())
-            .print("______")
+            .debounce(for: .seconds(1), scheduler: DispatchQueue.main)
             .sink { $0.isEmpty ? store.dispatch(.updateFeed) : store.dispatch(.search(text: $0)) }
             .store(in: &subscriptions)
     }
@@ -26,53 +25,13 @@ struct FeedView: View {
     var body: some View {
         mainView
     }
-    
+
     var mainView: some View {
         VStack {
-            VStack(alignment: .leading,
-                   spacing: 16) {
-
-                HStack {
-                    Spacer()
-                    Button {
-                        store.dispatch(.showAboutSheet)
-                    } label: {
-                        Image(systemName: "person")
-                    }
-                }
-                .padding()
-            }
-                   .padding(.horizontal, 16)
-
             if store.state.showEmptyView {
-                VStack {
-                    Spacer()
-                    Text("Empty").bold()
-                    Spacer()
-                }
+                emptyView()
             } else if store.state.showErrorView {
-                VStack {
-                    Spacer()
-                    Text("Error").monospacedDigit().bold().foregroundColor(.red)
-                    ImageView(systemName: "arrow.triangle.2.circlepath") {
-                        withAnimation {
-                            errorFeedDelay = true
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                errorFeedDelay = false
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                    store.dispatch(.updateFeed)
-                                }
-                            }
-                        }
-                    }
-                    .modifier(ButtonProgressViewModifier(provider: store.state.viewProgress, type: .clearView))
-                    .opacity(errorFeedDelay ? 0.5 : 1)
-                    .scaleEffect(errorFeedDelay ? 0.9 : 1)
-                    .disabled(errorFeedDelay)
-                    .padding()
-
-                    Spacer()
-                }
+                updateableErrorView()
             } else {
                 let searchBinding = Binding<String>(
                     get: { searchQueryBublisher.value },
@@ -81,16 +40,54 @@ struct FeedView: View {
                 SearchBar(searchQuery: searchBinding)
                 FeedCollectionView(store: store, searchQuery: searchBinding)
             }
+        }
+        .toolbar { toolbarView() }
+        .modifier(AlertShowViewModifier(provider: store.state.alert))
+    }
 
-            ButtonView(title: "NEW") {
+    private func updateableErrorView() -> some View {
+        VStack {
+            Spacer()
+            Text("Error").monospacedDigit().bold().foregroundColor(.red)
+            ImageView(systemName: "arrow.triangle.2.circlepath") {
+                withAnimation {
+                    errorFeedDelay = true
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        errorFeedDelay = false
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            store.dispatch(.updateFeed)
+                        }
+                    }
+                }
+            }
+            .modifier(ButtonProgressViewModifier(provider: store.state.viewProgress, type: .clearView))
+            .disabled(errorFeedDelay)
+            .padding()
+            
+            Spacer()
+        }
+    }
+
+    private func emptyView() -> some View {
+        return VStack {
+            Spacer()
+            Text("Empty").bold()
+            Spacer()
+        }
+    }
+
+    private func toolbarView() -> some View {
+        return HStack {
+            ImageView(systemName: "person", size: 18) {
+                store.dispatch(.showAboutSheet)
+            }
+            .padding([.leading, .trailing], 8)
+            ImageView(systemName: "plus", size: 20) {
                 store.dispatch(.addItem)
             }
-            .modifier(ProcessViewModifier(provider: store.state.processViewProgress))
-            .modifier(ButtonProgressViewModifier(provider: store.state.buttonProgress, type: .buttonView))
-            .padding()
+            .modifier(ProcessViewModifier(provider: store.state.processView))
+            .modifier(ButtonProgressViewModifier(provider: store.state.buttonProgress, type: .clearView))
         }
-        .modifier(AlertShowViewModifier(provider: store.state.alert))
-        .modifier(SheetShowViewModifier(provider: store.state.aboutSheetProvider))
     }
 }
 

@@ -19,15 +19,15 @@ struct FeedState: StateType {
     var showErrorView = false
 
     var alert = AlertProvider()
-    var aboutSheetProvider = AboutSheetProvider()
+//    var aboutSheetProvider = AboutSheetProvider()
 
     var viewProgress = ProgressViewProvider()
     var buttonProgress = ProgressViewProvider()
 
-    let processViewProgress: ProcessViewProvider
+    let processView: ProcessViewProvider
 
     init() {
-        processViewProgress = ProcessViewProvider(viewProgress, buttonProgress)
+        processView = ProcessViewProvider(viewProgress, buttonProgress)
     }
 }
 

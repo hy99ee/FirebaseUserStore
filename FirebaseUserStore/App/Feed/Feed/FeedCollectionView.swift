@@ -18,6 +18,9 @@ struct FeedCollectionView: View {
                             FeedCellView(title: store.state.items[index].title) {
                                 store.dispatch(.removeItem(id: store.state.items[index].id))
                             }
+                            .onTapGesture {
+                                store.dispatch(.click(store.state.items[index]))
+                            }
                             .padding(3)
                             .opacity(isAnimating ? 1 : 0)
                             .animation(.easeIn(duration: 0.7).delay(Double(index) * 0.03), value: isAnimating)

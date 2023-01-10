@@ -6,8 +6,17 @@ protocol SheetProviderType: ObservableObject {
     var presentationDetent: Set<PresentationDetent> { get set }
 }
 
+class SheetProvider<SheetViewType>: SheetProviderType where SheetViewType: View {
+    var presentationDetent: Set<PresentationDetent>
+    @Published var sheetView: SheetViewType?
+
+    init(presentationDetent: Set<PresentationDetent> = Set()) {
+        self.presentationDetent = presentationDetent
+    }
+}
+
 struct SheetShowViewModifier<SheetProvider: SheetProviderType>: ViewModifier {
-    @ObservedObject var provider: SheetProvider
+    var provider: SheetProvider
 
     func body(content: Content) -> some View {
         let announcingResult = Binding<Bool>(

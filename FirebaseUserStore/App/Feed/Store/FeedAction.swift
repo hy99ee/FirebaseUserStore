@@ -2,6 +2,9 @@ import Foundation
 
 enum FeedAction: Action {
     case updateFeed
+
+    case click(_ item: Item)
+
     case addItems(items: [Item])
     case addItem
     case removeItem(id: UUID)

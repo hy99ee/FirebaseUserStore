@@ -6,51 +6,43 @@ struct LoginView: View {
     @State private var password = ""
 
     var body: some View {
-        
         VStack(spacing: 16) {
-            
             VStack(spacing: 16) {
-                
                 InputTextFieldView(text: $email,
                                    placeholder: "Email",
                                    keyboardType: .emailAddress,
                                    systemImage: "envelope")
-                
                 InputPasswordView(password: $password,
                                   placeholder: "Password",
                                   systemImage: "lock")
             }
-            
+
             HStack {
                 Spacer()
                 Button(action: {
-                    store.dispatch(.openForgot(store: store))
+                    store.dispatch(.openForgot)
                 }, label: {
                     Text("Forgot Password?")
                 })
                 .font(.system(size: 16, weight: .bold))
             }
-            
+
             VStack(spacing: 16) {
-                
                 ButtonView(title: "Login") {
                     store.dispatch(.clickLogin(user: LoginCredentials(email: email, password: password)))
                 }
                 .modifier(ButtonProgressViewModifier(provider: store.state.loginProgress, type: .buttonView))
-                
+
                 ButtonView(title: "Register",
                            background: .clear,
                            foreground: .blue,
                            border: .blue) {
                     store.dispatch(.openRegister(store: store))
                 }
-
             }
         }
-        .modifier(SheetShowViewModifier(provider: store.state.registerSheet))
-        .modifier(SheetShowViewModifier(provider: store.state.forgotSheet))
         .modifier(AlertShowViewModifier(provider: store.state.alert))
-        .modifier(ProcessViewModifier(provider: store.state.processViewProgress))
+        .modifier(ProcessViewModifier(provider: store.state.processView))
         .padding(.horizontal, 15)
         .navigationTitle("Login")
     }
@@ -116,8 +108,8 @@ struct InputTextFieldView: View {
                 .onTapGesture {
                     isValid = true
                 }
-                .onChange(of: isValid, perform: { _ in
-                    focused = false
+                .onChange(of: isValid, perform: {
+                    focused = $0
                 })
                 .focused($focused)
         }

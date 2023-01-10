@@ -1,17 +1,26 @@
 import SwiftUI
 import Combine
 
-final class StateStore<StoreState, StoreAction, StoreMutation, StorePackages>:
-    ObservableObject where StoreState: StateType,
-                           StoreAction: Action,
-                           StoreMutation: Mutation,
-                           StorePackages: EnvironmentPackages {
-
+final class StateStore<
+    StoreState,
+    StoreAction,
+    StoreMutation,
+    StorePackages,
+    StoreTransition
+>: ObservableObject, TransitionSender
+where StoreState: StateType,
+      StoreAction: Action,
+      StoreMutation: Mutation,
+      StorePackages: EnvironmentPackages,
+      StoreTransition: TransitionType
+{
     typealias StoreMiddlewareRepository = MiddlewareRepository<StoreState, StoreAction, StorePackages>
     typealias StoreDispatcher = DispatcherType<StoreAction, StoreMutation, StorePackages>
-    typealias StoreReducer = ReducerType<StoreState, StoreMutation>
+    typealias StoreReducer = ReducerType<StoreState, StoreMutation, StoreTransition>
 
     @Published private(set) var state: StoreState
+
+    let transition = PassthroughSubject<StoreTransition, Never>()
 
     private let reducer: StoreReducer
     private let dispatcher: StoreDispatcher
@@ -54,7 +63,15 @@ final class StateStore<StoreState, StoreAction, StoreMutation, StorePackages>:
             .receive(on: DispatchQueue.main)
             .flatMap { [unowned self] in reducer(state, $0) } // Reduce
             .subscribe(on: DispatchQueue.main)
-            .compactMap { $0 }
+            .compactMap({
+                switch $0 {  
+                case let .state(state):
+                    return state
+                case let .coordinate(destination):
+                    self.transition.send(destination)
+                    return nil
+                }
+            })
             .assign(to: &$state)
     }
 }

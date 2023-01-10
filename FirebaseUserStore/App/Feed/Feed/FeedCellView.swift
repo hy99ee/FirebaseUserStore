@@ -2,7 +2,7 @@ import SwiftUI
 
 struct FeedCellView: View {
     let title: String
-    let action: () -> ()
+    let delete: () -> ()
     var body: some View {
         VStack {
             RoundedRectangle(cornerRadius: 12)
@@ -18,7 +18,7 @@ struct FeedCellView: View {
         .contentShape(.contextMenuPreview, RoundedRectangle(cornerRadius: 12, style: .continuous))
         .contextMenu {
             Button(role: .destructive) {
-                action()
+                delete()
             } label: {
                 Label("Delete", systemImage: "trash")
             }

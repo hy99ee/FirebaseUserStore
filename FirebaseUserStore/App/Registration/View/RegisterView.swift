@@ -2,7 +2,7 @@ import SwiftUI
 import Combine
 
 struct RegisterView: View {
-    @StateObject var store: LoginStore
+    @StateObject var store: RegisterationStore
     @State var newUser = RegistrationCredentials(email: "", password: "", firstName: "", lastName: "", occupation: "")
     var body: some View {
         NavigationView {
@@ -36,13 +36,12 @@ struct RegisterView: View {
                 }
 
                 ButtonView(title: "Sign up") {
-                    store.dispatch(.clickCreate(newUser: newUser))
+                    store.dispatch(.clickRegisteration(user: newUser))
                 }
-                .modifier(ButtonProgressViewModifier(provider: store.state.registerProgress, type: .buttonView))
+                .modifier(ButtonProgressViewModifier(provider: store.state.progress, type: .buttonView))
             }
             .padding(.horizontal, 15)
             .navigationTitle("Register")
-            .applyClose()
             .modifier(AlertShowViewModifier(provider: store.state.alert))
         }
     }

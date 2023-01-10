@@ -1,13 +1,6 @@
-//
-//  NavigationCloseViewModifier.swift
-//  Firebase User Account Management
-//
-//  Created by Tunde on 22/05/2021.
-//
-
 import SwiftUI
 
-struct NavigationCloseViewModifier: ViewModifier {
+struct NavigationCloseToolbarViewModifier: ViewModifier {
     
     @Environment(\.presentationMode) var presentationMode
     
@@ -23,9 +16,42 @@ struct NavigationCloseViewModifier: ViewModifier {
     }
 }
 
-extension View {
+struct NavigationCloseViewModifier: ViewModifier {
     
-    func applyClose() -> some View {
-        self.modifier(NavigationCloseViewModifier())
+    @Environment(\.presentationMode) var presentationMode
+    
+    func body(content: Content) -> some View {
+        VStack {
+            HStack {
+                Spacer()
+                Button(action: {
+                    presentationMode.wrappedValue.dismiss()
+                }, label: {
+                    Image(systemName: "xmark")
+                })
+            }.padding()
+            Spacer()
+            VStack {
+                Spacer()
+                content
+                Spacer()
+            }
+        }
+    }
+}
+
+enum CloseButtonSite {
+    case tollbar
+    case view
+}
+
+extension View {
+    @ViewBuilder func applyClose(_ style: CloseButtonSite = .tollbar) -> some View {
+        switch style {
+        case .tollbar:
+            self.modifier(NavigationCloseToolbarViewModifier())
+        case .view:
+            self.modifier(NavigationCloseViewModifier())
+        }
     }
 }

@@ -6,16 +6,10 @@ import Combine
 protocol SessionServiceType: ObservableObject {
     var state: SessionState { get }
     var userDetails: UserDetails? { get }
-    var makeSlice: SessionServiceSlice { get }
-
-    init()
 
     func logout()
 }
 
-extension SessionServiceType {
-    var makeSlice: SessionServiceSlice { SessionServiceSlice(state: state, userDetails: userDetails, logout: logout) }
-}
 struct SessionServiceSlice {
     let state: SessionState
     let userDetails: UserDetails?
@@ -30,7 +24,7 @@ final class SessionService: SessionServiceType, ObservableObject {
     private var handler: AuthStateDidChangeListenerHandle?
     private var subscriptions = Set<AnyCancellable>()
     
-    init() {
+    private init() {
         setupObservations()
     }
 

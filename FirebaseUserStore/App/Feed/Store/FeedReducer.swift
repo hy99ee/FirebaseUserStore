@@ -1,7 +1,7 @@
 import Combine
 import SwiftUI
 
-let feedReducer: ReducerType<FeedState, FeedMutation> = { _state, mutation in
+let feedReducer: ReducerType<FeedState, FeedMutation, FeedLink> = { _state, mutation in
     var state = _state
 
     switch mutation {
@@ -22,6 +22,9 @@ let feedReducer: ReducerType<FeedState, FeedMutation> = { _state, mutation in
 
     case .empty:
         emptyData()
+    
+    case let .detail(item):
+        return Just(.coordinate(destination: .detail(item))).eraseToAnyPublisher()
 
     case let .addItems(items):
         state.items.append(contentsOf: items)
@@ -41,7 +44,7 @@ let feedReducer: ReducerType<FeedState, FeedMutation> = { _state, mutation in
         errorData()
 
     case let .showAbout(data):
-        state.aboutSheetProvider.initialize(with: data)
+        return Just(.coordinate(destination: .about(data))).eraseToAnyPublisher()
 
     case let .progressViewStatus(status):
         state.viewProgress.progressStatus = status
@@ -53,7 +56,7 @@ let feedReducer: ReducerType<FeedState, FeedMutation> = { _state, mutation in
         break
     }
 
-    return Just(state).eraseToAnyPublisher()
+    return Just(.state(state)).eraseToAnyPublisher()
     
     func emptyData() {
         state.itemsPreloadersCount = 0
